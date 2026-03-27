@@ -1,12 +1,22 @@
 import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
 const App = () => {
   return (
     <div>
-      App
-      <h1 className="text-3xl font-bold text-blue-500">
-        Tailwind is working 🚀
-      </h1>
+      <BrowserRouter>
+        <Toaster />
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 };
