@@ -1,119 +1,112 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
-  const [formData, setFormData] = useState({ userName: "", password: "" });
-  const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const { login, isLoggingIn } = useAuthStore();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    login(formData);
+  const [formData, setFormData] = useState({ userName: "", password: "" });
+  const [show, setShow] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const errs = {};
+    if (!formData.userName.trim()) errs.userName = "Username is required";
+    if (!formData.password) errs.password = "Password is required";
+    return errs;
   };
 
-  const inputCls =
-    "w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-zinc-100 " +
-    "placeholder-zinc-500 focus:outline-none focus:border-amber-400 focus:ring-1 " +
-    "focus:ring-amber-400/30 transition-colors duration-150";
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      return;
+    }
+    const success = await login(formData);
+    if (success) navigate("/");
+  };
+
+  const inputCls = (field) =>
+    "w-full bg-white border " +
+    (errors[field] ? "border-red-400" : "border-gray-300") +
+    " rounded-lg px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 " +
+    "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors duration-150";
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
-      {/* Ambient glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-amber-500/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative w-full max-w-md">
-        {/* Card */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden">
           <div className="px-8 py-8">
-            {/* Logo */}
-            <div className="flex items-center gap-2 mb-7">
-              <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center">
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-900" />
-              </div>
-              <span className="text-zinc-100 font-semibold tracking-tight text-lg">
-                YourApp
-              </span>
+            <div className="mb-6">
+              <h1 className="text-xl font-bold text-gray-800">Sign in</h1>
+              <p className="text-sm text-gray-500 mt-1">Welcome back</p>
             </div>
 
-            <h1 className="text-2xl font-bold text-zinc-50 tracking-tight">
-              Welcome back
-            </h1>
-            <p className="text-zinc-500 text-sm mt-1 mb-7">
-              Sign in to continue to your account.
-            </p>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Username */}
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                   Username
                 </label>
                 <input
                   type="text"
+                  name="userName"
                   value={formData.userName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, userName: e.target.value })
-                  }
-                  placeholder="your_username"
-                  className={inputCls}
+                  onChange={handleChange}
+                  placeholder="User name"
                   autoComplete="username"
+                  className={inputCls("userName")}
                 />
+                {errors.userName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.userName}</p>
+                )}
               </div>
 
-              {/* Password */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Password
-                  </label>
-                  <button
-                    type="button"
-                    className="text-xs text-zinc-500 hover:text-amber-400 transition-colors"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Password
+                </label>
                 <div className="relative">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={show ? "text" : "password"}
+                    name="password"
                     value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    placeholder="••••••••"
-                    className={`${inputCls} pr-10`}
+                    onChange={handleChange}
+                    placeholder="Your password"
                     autoComplete="current-password"
+                    className={`${inputCls("password")} pr-10`}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-amber-400 transition-colors"
+                    onClick={() => setShow((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 transition-colors"
                   >
-                    {showPassword ? (
-                      <FaEyeSlash size={14} />
-                    ) : (
-                      <FaEye size={14} />
-                    )}
+                    {show ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                )}
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={isLoggingIn}
-                className="w-full bg-amber-400 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed
-                           text-zinc-900 font-bold py-2.5 rounded-lg text-sm transition-all duration-150
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
+                           text-white font-semibold py-2.5 rounded-lg text-sm transition-colors duration-150
                            active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
               >
                 {isLoggingIn ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-zinc-700 border-t-zinc-900 rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-blue-300 border-t-white rounded-full animate-spin" />
                     Signing in…
                   </>
                 ) : (
@@ -122,37 +115,17 @@ const Login = () => {
               </button>
             </form>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3 my-6">
-              <div className="flex-1 h-px bg-zinc-800" />
-              <span className="text-zinc-600 text-xs">or</span>
-              <div className="flex-1 h-px bg-zinc-800" />
-            </div>
-
-            {/* Register link */}
-            <p className="text-center text-sm text-zinc-500">
+            <p className="text-center text-sm text-gray-500">
               Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="text-amber-400 font-semibold hover:text-amber-300 transition-colors"
+                className="text-blue-600 font-semibold hover:text-blue-700 transition-colors"
               >
-                Create one
+                Sign up
               </Link>
             </p>
           </div>
         </div>
-
-        <p className="text-center text-zinc-600 text-xs mt-5">
-          By continuing you agree to our{" "}
-          <span className="text-zinc-500 hover:text-amber-400 cursor-pointer transition-colors">
-            Terms
-          </span>{" "}
-          &{" "}
-          <span className="text-zinc-500 hover:text-amber-400 cursor-pointer transition-colors">
-            Privacy Policy
-          </span>
-          .
-        </p>
       </div>
     </div>
   );

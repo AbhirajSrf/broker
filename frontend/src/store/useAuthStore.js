@@ -10,10 +10,13 @@ export const useAuthStore = create((set, get) => ({
 
   // Check if user is authenticated
   checkAuth: async () => {
+    set({ isCheckingAuth: true });
     try {
-      const res = await axiosInstance.get("auth/check");
+      const res = await axiosInstance.get("/auth/check");
+      console.log("checkAuth response:", res.data); // 👈 add this
       set({ authUser: res.data });
     } catch (error) {
+      console.log("checkAuth error:", error.response); // 👈 and this
       if (error.response?.status === 401) {
         console.error("No user logged in yet");
       } else {
@@ -29,12 +32,13 @@ export const useAuthStore = create((set, get) => ({
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-      const res = await axiosInstance.post("auth/signup", data);
+      const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
       toast.success("Account created successfully!");
+      return true;
     } catch (error) {
       toast.error(error.response?.data?.message || "Signup failed");
-      set({ authUser: null });
+      throw error; // 👈 rethrow so Signup.jsx can catch it
     } finally {
       set({ isSigningUp: false });
     }
@@ -48,9 +52,13 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
 
       toast.success("logged in successfully!!");
+
+      return true;
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
       set({ authUser: null });
+
+      return false;
     } finally {
       set({ isLoggingIn: false });
     }

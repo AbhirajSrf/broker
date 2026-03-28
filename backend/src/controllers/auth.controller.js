@@ -2,6 +2,14 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 
+export const checkAuth = (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const signup = async (req, res) => {
   const { fullName, userName, email, password } = req.body;
 
@@ -15,12 +23,14 @@ export const signup = async (req, res) => {
         .status(400)
         .json({ message: "Password must be at least 6 characters" });
     }
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already taken" });
+    }
 
-    const existingUser = await User.findOne({ $or: [{ userName }, { email }] });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already taken" });
+    const existingUserName = await User.findOne({ userName });
+    if (existingUserName) {
+      return res.status(400).json({ message: "Username already taken" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -41,6 +51,7 @@ export const signup = async (req, res) => {
       fullName: savedUser.fullName,
       userName: savedUser.userName,
       email: savedUser.email,
+      role: savedUser.role,
     });
   } catch (error) {
     console.error("Error in signup controller: ", error);
@@ -69,11 +80,23 @@ export const login = async (req, res) => {
 
     res.status(200).json({
       _id: user._id,
+      fullName: user.fullName,
       userName: user.userName,
+      email: user.email,
+      role: user.role,
     });
   } catch (error) {
     console.error("Error in login controller: ", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-export const logout = async (req, res) => {};
+
+export const logout = async (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Error in logout controller: ", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

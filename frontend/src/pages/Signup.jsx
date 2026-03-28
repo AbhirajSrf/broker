@@ -38,7 +38,6 @@ const Signup = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
@@ -47,15 +46,24 @@ const Signup = () => {
       return;
     }
     const { confirmPassword, ...payload } = formData;
-    await signup(payload);
-    navigate("/login");
+    try {
+      const success = await signup(payload);
+      if (success) navigate("/login");
+    } catch (error) {
+      const message = error.response?.data?.message || "";
+      if (message === "Email already taken") {
+        setErrors((prev) => ({ ...prev, email: "Email already taken" }));
+      } else if (message === "Username already taken") {
+        setErrors((prev) => ({ ...prev, userName: "Username already taken" }));
+      }
+    }
   };
 
   const inputCls = (field) =>
-    "w-full bg-zinc-900 border " +
-    (errors[field] ? "border-rose-500" : "border-zinc-700") +
-    " rounded-lg px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 " +
-    "focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-colors duration-150";
+    "w-full bg-white border " +
+    (errors[field] ? "border-red-400" : "border-gray-300") +
+    " rounded-lg px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 " +
+    "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors duration-150";
 
   const fields = [
     {
@@ -76,44 +84,27 @@ const Signup = () => {
       name: "email",
       label: "Email",
       type: "email",
-      placeholder: "jane@example.com",
+      placeholder: "example@gmail.com",
       auto: "email",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-10">
-      {/* Ambient glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-amber-500/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative w-full max-w-md">
-        {/* Card */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden">
           <div className="px-8 py-8">
-            {/* Logo */}
-            <div className="flex items-center gap-2 mb-7">
-              <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center">
-                <div className="w-2.5 h-2.5 rounded-full bg-zinc-900" />
-              </div>
-              <span className="text-zinc-100 font-semibold tracking-tight text-lg">
-                YourApp
-              </span>
+            <div className="mb-6">
+              <h1 className="text-xl font-bold text-gray-800">
+                Create account
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">Get started today</p>
             </div>
 
-            <h1 className="text-2xl font-bold text-zinc-50 tracking-tight">
-              Create your account
-            </h1>
-            <p className="text-zinc-500 text-sm mt-1 mb-7">
-              Join us today — it only takes a minute.
-            </p>
-
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
-              {/* Text fields */}
               {fields.map(({ name, label, type, placeholder, auto }) => (
                 <div key={name}>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                     {label}
                   </label>
                   <input
@@ -126,14 +117,13 @@ const Signup = () => {
                     className={inputCls(name)}
                   />
                   {errors[name] && (
-                    <p className="text-rose-400 text-xs mt-1">{errors[name]}</p>
+                    <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
                   )}
                 </div>
               ))}
 
-              {/* Password */}
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -142,7 +132,7 @@ const Signup = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Min. 6 characters"
+                    placeholder="Minimum 6 characters"
                     autoComplete="new-password"
                     className={`${inputCls("password")} pr-10`}
                   />
@@ -151,7 +141,7 @@ const Signup = () => {
                     onClick={() =>
                       setShow((s) => ({ ...s, password: !s.password }))
                     }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-amber-400 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 transition-colors"
                   >
                     {show.password ? (
                       <FaEyeSlash size={14} />
@@ -161,15 +151,12 @@ const Signup = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-rose-400 text-xs mt-1">
-                    {errors.password}
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{errors.password}</p>
                 )}
               </div>
 
-              {/* Confirm Password */}
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                   Confirm password
                 </label>
                 <div className="relative">
@@ -187,7 +174,7 @@ const Signup = () => {
                     onClick={() =>
                       setShow((s) => ({ ...s, confirm: !s.confirm }))
                     }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-amber-400 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 transition-colors"
                   >
                     {show.confirm ? (
                       <FaEyeSlash size={14} />
@@ -197,23 +184,22 @@ const Signup = () => {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-rose-400 text-xs mt-1">
+                  <p className="text-red-500 text-xs mt-1">
                     {errors.confirmPassword}
                   </p>
                 )}
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={isSigningUp}
-                className="w-full bg-amber-400 hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed
-                           text-zinc-900 font-bold py-2.5 rounded-lg text-sm transition-all duration-150
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
+                           text-white font-semibold py-2.5 rounded-lg text-sm transition-colors duration-150
                            active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
               >
                 {isSigningUp ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-zinc-700 border-t-zinc-900 rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-blue-300 border-t-white rounded-full animate-spin" />
                     Creating account…
                   </>
                 ) : (
@@ -222,37 +208,17 @@ const Signup = () => {
               </button>
             </form>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3 my-6">
-              <div className="flex-1 h-px bg-zinc-800" />
-              <span className="text-zinc-600 text-xs">or</span>
-              <div className="flex-1 h-px bg-zinc-800" />
-            </div>
-
-            {/* Login link */}
-            <p className="text-center text-sm text-zinc-500">
+            <p className="text-center text-sm text-gray-500">
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="text-amber-400 font-semibold hover:text-amber-300 transition-colors"
+                className="text-blue-600 font-semibold hover:text-blue-700 transition-colors"
               >
                 Sign in
               </Link>
             </p>
           </div>
         </div>
-
-        <p className="text-center text-zinc-600 text-xs mt-5">
-          By continuing you agree to our{" "}
-          <span className="text-zinc-500 hover:text-amber-400 cursor-pointer transition-colors">
-            Terms
-          </span>{" "}
-          &{" "}
-          <span className="text-zinc-500 hover:text-amber-400 cursor-pointer transition-colors">
-            Privacy Policy
-          </span>
-          .
-        </p>
       </div>
     </div>
   );
