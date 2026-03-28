@@ -1,6 +1,6 @@
 # Broker — Real Estate Buyer Portal
 
-A full-stack real estate portal where buyers can browse properties, like them, and save favourites.
+A full-stack(MERN) application real estate portal where buyers can browse properties, like them, and save favourites.
 
 ---
 
