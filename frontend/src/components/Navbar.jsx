@@ -9,8 +9,6 @@ const Navbar = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  console.log(authUser); // 👈 Check browser console, then remove this line
-
   const handleLogout = async () => {
     await logout();
     navigate("/login");

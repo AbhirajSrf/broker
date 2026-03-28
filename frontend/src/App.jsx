@@ -15,7 +15,7 @@ const App = () => {
     checkAuth();
   }, []);
 
-  if (isCheckingAuth) return null; // or a loading spinner
+  if (isCheckingAuth) return null;
 
   return (
     <div>
