@@ -34,81 +34,63 @@ npm run dev
 
 ## Example Flow
 
-### 1. Sign Up
+## Example Flow
 
-**POST** `http://localhost:5000/api/auth/signup`
+### 1. Create an Account
 
-```json
-{
-  "fullName": "Jane Smith",
-  "userName": "jane_smith",
-  "email": "jane@example.com",
-  "password": "123456"
-}
-```
+A new user signs up by providing:
+
+- Full Name
+- Username
+- Email
+- Password
 
 ---
 
 ### 2. Log In
 
-**POST** `http://localhost:5000/api/auth/login`
-
-```json
-{
-  "userName": "jane_smith",
-  "password": "123456"
-}
-```
-
-A JWT cookie is set automatically. All protected routes use this cookie.
+The user logs in using their username and password.  
+Once logged in, they can access all protected features.
 
 ---
 
-### 3. Add a Property (Postman)
+### 3. Browse Properties
 
-**POST** `http://localhost:5000/api/properties`
-
-```json
-{
-  "title": "Modern Apartment in City Center",
-  "description": "A beautiful modern apartment with stunning city views.",
-  "price": 250000,
-  "location": "Kathmandu, Nepal",
-  "propertyType": "apartment",
-  "bedrooms": 3,
-  "bathrooms": 2,
-  "images": [
-    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800"
-  ]
-}
-```
-
-> `propertyType` must be one of: `apartment`, `house`, `villa`, `land`
-
-After adding, refresh the browser to see the property on the dashboard.
+Users can view all available properties on the dashboard without logging in.
 
 ---
 
-### 4. Browse Properties
+### 4. Add a Property
 
-Open the app in the browser. All properties are publicly visible without logging in.
+Logged-in users can add new properties by filling in details such as:
+
+- Title
+- Description
+- Price
+- Location
+- Property Type (apartment, house, villa, land)
+- Number of bedrooms and bathrooms
+- Property images
+
+After submission, the property appears on the dashboard.
 
 ---
 
 ### 5. Like a Property
 
-Click the ❤️ icon on any property card. You must be logged in. The like count updates instantly.
+Users can click the ❤️ icon on a property to like it.  
+The like count updates instantly.
 
 ---
 
 ### 6. Add to Favourites
 
-Click the ⭐ icon on any property card. You must be logged in. The star turns blue when saved.
+Users can click the ⭐ icon to save a property to their favourites.  
+Saved properties are visually highlighted.
 
 ---
 
 ### 7. View Favourites
 
-Navigate to the **Favourites** page from the navbar. All your starred properties appear here. Click the star again to remove a property from favourites.
-
----
+Users can navigate to the **Favourites** page to see all saved properties.  
+They can remove a property from favourites by clicking the ⭐ icon again.
