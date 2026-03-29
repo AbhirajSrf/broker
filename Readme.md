@@ -45,6 +45,9 @@ A new user signs up by providing:
 - Email
 - Password
 
+> ⚠️ The username and email must be unique.  
+> The system checks the database and prevents registration if they are already in use.
+
 ---
 
 ### 2. Log In
