@@ -7,12 +7,17 @@ A full-stack(MERN) application real estate portal where buyers can browse proper
 ## Tech Stack
 
 - **Frontend** — React, Zustand, Tailwind CSS, Axios
-- **Backend** — Node.js, Express, MongoDB, Mongoose
+- **Backend** — Node.js, Express, MongoDB, Mongoose, cors
 - **Auth** — JWT (stored in HTTP-only cookie)
 
 ---
 
 ## Getting Started
+
+Open two separate terminals:
+
+- One for the backend server
+- One for the frontend application
 
 ### Backend
 
@@ -31,8 +36,6 @@ npm run dev
 ```
 
 ---
-
-## Example Flow
 
 ## Example Flow
 
