@@ -5,7 +5,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.route.js";
-import propertyRoutes from "./routes/property.route.js";
 
 const PORT = ENV.PORT || 5000;
 
@@ -16,7 +15,6 @@ app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
-app.use("/api/properties", propertyRoutes);
 
 async function startServer() {
   try {
